@@ -1,62 +1,109 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { useState } from 'react';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { authAPI } from '../lib/api';
+import { useAuthStore } from '../store/auth';
+import toast from 'react-hot-toast';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'Kw@ch@B3t_M@l@w1_S3cr3t_K3y_2024_X9Z7Q2P5R8';
+export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuthStore();
+  const [form, setForm] = useState({ phone: '+265', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
-
-  const { phone, password } = req.body;
-
-  try {
-    // 1. TODO: Fetch user from your database here.
-    // Example: const user = await db.user.findUnique({ where: { phone } })
-    
-    // Simulating database lookup for Super Admin Charles Banda
-    let userFromDB = null;
-    if (phone === '+265991234567') {
-      userFromDB = {
-        id: '1',
-        name: 'Charles Banda',
-        phone: '+265991234567',
-        role: 'super_admin',
-        is_admin: true,
-        status: 'active',
-        // In production, this hash is saved in DB. Plaintext is: "AdminSecure123"
-        password_hash: '$2a$10$3eY9n6s5Fp66vC43C6h.VOhNstVIsHn/wNsk6GvVpxiVqR7L9H7re', 
-      };
-    }
-
-    if (!userFromDB) {
-      return res.status(401).json({ message: 'Invalid phone or password' });
-    }
-
-    // 2. Compare entered plaintext password with the hashed password from the DB
-    const isPasswordCorrect = await bcrypt.compare(password, userFromDB.password_hash);
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ message: 'Invalid phone or password' });
-    }
-
-    // 3. Generate secure token
-    const token = jwt.sign(
-      { id: userFromDB.id, phone: userFromDB.phone, role: userFromDB.role, is_admin: userFromDB.is_admin },
-      JWT_SECRET,
-      { expiresIn: '12h' }
-    );
-
-    return res.status(200).json({
-      token,
-      user: {
-        id: userFromDB.id,
-        name: userFromDB.name,
-        phone: userFromDB.phone,
-        role: userFromDB.role,
-        is_admin: userFromDB.is_admin
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await authAPI.login(form);
+      const { user, token } = res.data;
+      if (!user.is_admin) {
+        toast.error('Access denied. Admin accounts only.');
+        return;
       }
-    });
-
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong' });
+      login(user, token);
+      toast.success(`Welcome back, ${user.full_name.split(' ')[0]}!`);
+      router.push('/');
+    } catch (err: any) {
+      toast.error(err.message || 'Login failed.');
+    } finally {
+      setLoading(false);
+    }
   }
+
+  return (
+    <>
+      <Head><title>Admin Login — Kwacha Bet</title></Head>
+      <div className="min-h-screen bg-admin-bg flex items-center justify-center px-4">
+        <div className="w-full max-w-sm">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 bg-brand rounded-xl flex items-center justify-center shadow-lg shadow-brand/30">
+                <span className="text-black font-black text-xl">K</span>
+              </div>
+              <div className="text-left">
+                <p className="text-white font-black text-xl">KwachaBet</p>
+                <p className="text-brand text-xs font-semibold">ADMIN PANEL</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="admin-card p-6">
+            <h1 className="text-white font-bold text-xl mb-1">Administrator Login</h1>
+            <p className="text-gray-500 text-sm mb-6">Restricted access — authorized personnel only</p>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Phone Number</label>
+                <input
+                  value={form.phone}
+                  onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                  placeholder="+265XXXXXXXXX"
+                  required
+                  className="admin-input font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                    placeholder="Your password"
+                    required
+                    className="admin-input pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs"
+                  >
+                    {showPass ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" disabled={loading} className="btn-primary w-full py-3 mt-2">
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                    Authenticating...
+                  </span>
+                ) : 'Login to Admin Panel'}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-600">
+              🔒 All admin actions are logged and audited
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
