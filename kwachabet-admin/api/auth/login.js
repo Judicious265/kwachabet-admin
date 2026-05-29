@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secret_production_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'Kw@ch@B3t_M@l@w1_S3cr3t_K3y_2024_X9Z7Q2P5R8';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
