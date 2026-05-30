@@ -1,52 +1,68 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import Cookies from 'js-cookie';
 
-interface AuthState {
-  user: { id: string; name: string; phone: string; role: string; is_admin: boolean } | null;
+interface User {
+  id: string;
+  phone: string;
+  full_name: string;
+  is_admin: boolean;
+}
+
+interface AuthStore {
+  user: User | null;
   token: string | null;
   isAuthenticated: boolean;
-  login: (phone: string, password: string) => Promise<void>;
+  _hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => {
-  // Recover token and user on page reload if in browser
-  const savedToken = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
-  const savedUser = typeof window !== 'undefined' ? localStorage.getItem('admin_user') : null;
-
-  if (savedToken) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-  }
-
-  return {
-    user: savedUser ? JSON.parse(savedUser) : null,
-    token: savedToken,
-    isAuthenticated: !!savedToken,
-
-    login: async (phone, password) => {
-      // 1. Send phone and password to the database API
-      const response = await axios.post('/api/auth/login', { phone, password });
-      const { token, user } = response.data;
-
-      // 2. Save session locally
-      localStorage.setItem('admin_token', token);
-      localStorage.setItem('admin_user', JSON.stringify(user));
-      
-      // 3. Attach token to all outgoing API requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      set({
-        user,
-        token,
-        isAuthenticated: true,
-      });
-    },
-
-    logout: () => {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      delete axios.defaults.headers.common['Authorization'];
-      set({ user: null, token: null, isAuthenticated: false });
-    },
-  };
-});
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      _hasHydrated: false,
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
+      login: (user, token) => {
+        // Save token in both cookie and localStorage for resilience
+        Cookies.set('kb_admin_token', token, {
+          expires: 1,
+          secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+          sameSite: 'strict',
+        });
+        set({ user, token, isAuthenticated: true });
+      },
+      logout: () => {
+        Cookies.remove('kb_admin_token');
+        set({ user: null, token: null, isAuthenticated: false });
+        if (typeof window !== 'undefined') window.location.href = '/login';
+      },
+    }),
+    {
+      name: 'kb-admin-auth',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (s) => ({
+        user: s.user,
+        token: s.token,
+        isAuthenticated: s.isAuthenticated,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+          // Re-sync cookie from localStorage token on page load
+          if (state.token) {
+            Cookies.set('kb_admin_token', state.token, {
+              expires: 1,
+              secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+              sameSite: 'strict',
+            });
+          }
+        }
+      },
+    }
+  )
+);
