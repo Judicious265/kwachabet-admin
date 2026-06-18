@@ -9,7 +9,7 @@ import {
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, StatsSkeleton, Skeleton, EmptyState } from '../components/ui';
 import { adminAPI, api, fmt } from '../adminApi';
-import { useAuthStore } from '../store/auth';
+import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
 const COLORS = ['#00C853', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+ const { admin, isAuthenticated } = useAdminStore(); 
   const [stats, setStats]               = useState<any>(null);
   const [recentTickets, setRecentTickets] = useState<any[]>([]);
   const [recentTxns, setRecentTxns]     = useState<any[]>([]);
