@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useAdminStore, ROLE_NAV } from '../../store/adminStore';
-import { fmt, ROLE_COLORS } from '../../lib/api';
+import { fmt, ROLE_COLORS } from '../../lib/adminApi';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -156,8 +156,5 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
 
       </div>
     </div>
-  );
-}
-
   );
 }
