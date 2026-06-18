@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Badge, SearchBar, Pagination, TableSkeleton, EmptyState, ExportButtons, Modal, StatCard } from '../components/ui';
-import { adminAPI, fmt } from '../lib/adminApi';
+import { adminAPI, fmt } from '../lib/api';
 import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
