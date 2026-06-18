@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { adminAuthAPI } from '../adminApi';
+import { adminAuthAPI } from '../lib/api';
 import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
