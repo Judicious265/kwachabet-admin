@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Badge, RiskBadge, SearchBar, TableSkeleton, EmptyState, Modal, StatCard } from '../components/ui';
 import { adminAPI, fmt } from '../lib/api';
-import { useAuthStore } from '../store/auth';
+import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
 const SEV_COLOR: Record<string, string> = {
@@ -16,7 +16,7 @@ const SEV_COLOR: Record<string, string> = {
 
 export default function FraudPage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { admin, isAuthenticated } = useAdminStore();
   const [flags, setFlags] = useState<any[]>([]);
   const [highRisk, setHighRisk] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
