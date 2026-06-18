@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, StatsSkeleton, Skeleton, EmptyState } from '../components/ui';
-import { adminAPI, api, fmt } from '../lib/api';
+import { adminAPI, api, fmt } from '../adminApi';
 import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
