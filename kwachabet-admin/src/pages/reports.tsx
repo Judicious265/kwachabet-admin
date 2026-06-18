@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, TableSkeleton } from '../components/ui';
 import { adminAPI, api, fmt } from '../lib/api';
-import { useAuthStore } from '../store/auth';
+import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
 const generateWeeklyData = () => [
@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function ReportsPage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+ const { admin, isAuthenticated } = useAdminStore();
   const [stats, setStats] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
