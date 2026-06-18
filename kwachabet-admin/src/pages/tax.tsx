@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, TableSkeleton, EmptyState, ExportButtons } from '../components/ui';
 import { api, fmt } from '../lib/api';
-import { useAuthStore } from '../store/auth';
+import { useAdminStore } from '../store/adminStore';
 import toast from 'react-hot-toast';
 
 const TAX_RATE = 0.20;
@@ -31,7 +31,7 @@ const generateDailyData = () => {
 
 export default function TaxPage() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+ const { admin, isAuthenticated } = useAdminStore();
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
