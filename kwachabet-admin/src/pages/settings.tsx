@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Modal } from '../components/ui';
 import { adminAPI, api, fmt } from '../lib/api';
-import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
 const SETTING_TABS = [
@@ -18,7 +18,7 @@ const SETTING_TABS = [
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { admin, isAuthenticated } = useAdminStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [tab, setTab] = useState('general');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
