@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Badge, SearchBar, TableSkeleton, EmptyState, Modal, StatCard, Pagination } from '../components/ui';
 import { api, fmt } from '../lib/api';
-import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
 const SPORTS = [
@@ -31,7 +31,7 @@ const STATUS_OPTS = [
 
 export default function SportsPage() {
   const router = useRouter();
-  const { admin, isAuthenticated } = useAdminStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [events, setEvents]           = useState<any[]>([]);
   const [loading, setLoading]         = useState(true);
