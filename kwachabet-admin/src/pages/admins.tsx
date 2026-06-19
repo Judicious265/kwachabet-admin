@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layouts/AdminLayout';
 import { Modal, EmptyState, TableSkeleton, Pagination, SearchBar } from '../components/ui';
 import { adminTeamAPI, fmt, ROLE_COLORS } from '../lib/adminApi';
-import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
 const ROLES = [
@@ -16,7 +16,7 @@ const ROLES = [
 
 export default function AdminsPage() {
   const router = useRouter();
-  const { admin: currentAdmin, isAuthenticated, hasPermission } = useAdminStore();
+ const { user, isAuthenticated } = useAuthStore();
 
   const [admins, setAdmins]         = useState<any[]>([]);
   const [roles, setRoles]           = useState<any[]>([]);
