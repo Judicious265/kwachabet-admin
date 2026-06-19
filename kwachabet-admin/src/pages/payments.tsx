@@ -4,12 +4,12 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Badge, SearchBar, Pagination, TableSkeleton, EmptyState, ExportButtons, Modal, StatCard } from '../components/ui';
 import { adminAPI, fmt } from '../lib/api';
-import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
 export default function PaymentsPage() {
   const router = useRouter();
- const { admin, isAuthenticated } = useAdminStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [tab, setTab] = useState<'pending' | 'transactions'>('pending');
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
