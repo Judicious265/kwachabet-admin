@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { useAdminStore, ROLE_NAV } from '../../store/adminStore';
-import { fmt, ROLE_COLORS } from '../../lib/adminApi';
+import { useAdminStore, ROLE_NAV } from '../../store/auth';
+import { fmt, ROLE_COLORS } from '../../lib/api';
 
 interface LayoutProps {
   children: React.ReactNode;
