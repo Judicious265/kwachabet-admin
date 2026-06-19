@@ -4,12 +4,12 @@ import { useRouter } from 'next/router';
 import AdminLayout from '../components/layout/AdminLayout';
 import { Badge, RiskBadge, SearchBar, Modal, Pagination, TableSkeleton, EmptyState, ExportButtons } from '../components/ui';
 import { adminAPI, fmt } from '../lib/api';
-import { useAdminStore } from '../store/adminStore';
+import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
 export default function CustomersPage() {
   const router = useRouter();
- const { admin, isAuthenticated } = useAdminStore();
+  const { user, isAuthenticated } = useAuthStore();
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
