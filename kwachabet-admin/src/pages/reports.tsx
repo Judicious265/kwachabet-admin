@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, TableSkeleton } from '../components/ui';
-import { adminAPI, api, fmt } from '../lib/api';
+import { adminAPI, fmt } from '../lib/api';
 import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
