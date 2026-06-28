@@ -31,7 +31,7 @@ const STATUS_OPTS = [
 
 export default function SportsPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const [events, setEvents]           = useState<any[]>([]);
   const [loading, setLoading]         = useState(true);
