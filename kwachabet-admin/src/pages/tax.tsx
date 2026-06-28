@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import AdminLayout from '../components/layout/AdminLayout';
 import { StatCard, TableSkeleton, EmptyState, ExportButtons } from '../components/ui';
-import { api, fmt } from '../lib/api';
+import { adminAPI, fmt } from '../lib/api';
 import { useAuthStore } from '../store/auth';
 import toast from 'react-hot-toast';
 
