@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 export default function CustomersPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -48,7 +48,7 @@ export default function CustomersPage() {
         if (!reason) return toast.error('Please enter a reason');
         await adminAPI.suspendUser(actionModal.user.id, reason);
         toast.success('User suspended');
-      } else if (actionModal.type === 'unsuspend') {
+      } else {
         await adminAPI.unsuspendUser(actionModal.user.id);
         toast.success('User unsuspended');
       }
@@ -63,13 +63,14 @@ export default function CustomersPage() {
     const headers = ['Name','Phone','Balance','Risk Score','Status','Joined'];
     const rows = customers.map(c => [
       c.full_name, c.phone, c.balance, c.risk_score,
-      c.is_suspended ? 'Suspended' : 'Active',
-      fmt.date(c.created_at)
+      c.is_suspended ? 'Suspended' : 'Active', fmt.date(c.created_at)
     ]);
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'customers.csv'; a.click();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'customers.csv';
+    a.click();
     toast.success('CSV exported');
   }
 
@@ -78,7 +79,7 @@ export default function CustomersPage() {
   );
 
   const FILTERS = [
-    { id: 'all',       label: 'All Users' },
+    { id: 'all', label: 'All Users' },
     { id: 'suspended', label: 'Suspended' },
     { id: 'high_risk', label: 'High Risk' },
   ];
@@ -87,41 +88,28 @@ export default function CustomersPage() {
     <>
       <Head><title>Customers — Kwacha Bet Admin</title></Head>
       <AdminLayout title="Customer Management">
-
-        {/* Filter tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
           {FILTERS.map(f => (
             <button key={f.id} onClick={() => { setFilter(f.id); setPage(1); }}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === f.id ? 'bg-brand text-black' : 'bg-admin-card border border-admin-border text-gray-400 hover:border-gray-500'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === f.id ? 'bg-brand text-black' : 'bg-admin-card border border-admin-border text-gray-400'}`}>
               {f.label}
             </button>
           ))}
         </div>
 
-        {/* Search + export */}
-        <SearchBar value={search} onChange={setSearch} placeholder="Search by phone or name..." >
-          <ExportButtons onCSV={exportCSV} onPDF={() => toast('PDF export coming soon')} />
+        <SearchBar value={search} onChange={setSearch} placeholder="Search by phone or name...">
+          <ExportButtons onCSV={exportCSV} onPDF={() => toast('PDF coming soon')} />
           <button onClick={load} className="btn-secondary text-sm py-2 px-3">🔄</button>
         </SearchBar>
 
-        {/* Table */}
         <div className="admin-card overflow-hidden">
-          {loading ? <TableSkeleton rows={8} cols={7} /> : filtered.length === 0 ? (
-            <EmptyState icon="👥" title="No customers found" subtitle="Try adjusting your search or filter" />
-          ) : (
+          {loading ? <TableSkeleton rows={8} cols={7} /> :
+           filtered.length === 0 ? <EmptyState icon="👥" title="No customers found" /> : (
             <>
               <div className="overflow-x-auto">
                 <table className="admin-table">
                   <thead>
-                    <tr>
-                      <th>Customer</th>
-                      <th>Phone</th>
-                      <th>Balance</th>
-                      <th>Risk</th>
-                      <th>Status</th>
-                      <th>Joined</th>
-                      <th>Actions</th>
-                    </tr>
+                    <tr><th>Customer</th><th>Phone</th><th>Balance</th><th>Risk</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
                   </thead>
                   <tbody>
                     {filtered.map(c => (
@@ -144,23 +132,11 @@ export default function CustomersPage() {
                         <td className="text-xs text-gray-500">{fmt.date(c.created_at)}</td>
                         <td>
                           <div className="flex items-center gap-1.5">
-                            <button
-                              onClick={() => setSelected(c)}
-                              className="text-xs text-blue-400 hover:text-blue-300 transition-colors px-2 py-1 rounded hover:bg-blue-900/20">
-                              View
-                            </button>
+                            <button onClick={() => setSelected(c)} className="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded hover:bg-blue-900/20">View</button>
                             {c.is_suspended ? (
-                              <button
-                                onClick={() => setActionModal({ type: 'unsuspend', user: c })}
-                                className="text-xs text-green-400 hover:text-green-300 transition-colors px-2 py-1 rounded hover:bg-green-900/20">
-                                Activate
-                              </button>
+                              <button onClick={() => setActionModal({ type: 'unsuspend', user: c })} className="text-xs text-green-400 hover:text-green-300 px-2 py-1 rounded hover:bg-green-900/20">Activate</button>
                             ) : (
-                              <button
-                                onClick={() => setActionModal({ type: 'suspend', user: c })}
-                                className="text-xs text-red-400 hover:text-red-300 transition-colors px-2 py-1 rounded hover:bg-red-900/20">
-                                Suspend
-                              </button>
+                              <button onClick={() => setActionModal({ type: 'suspend', user: c })} className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-900/20">Suspend</button>
                             )}
                           </div>
                         </td>
@@ -174,7 +150,6 @@ export default function CustomersPage() {
           )}
         </div>
 
-        {/* Customer detail modal */}
         <Modal open={!!selected} onClose={() => setSelected(null)} title="Customer Profile">
           {selected && (
             <div className="space-y-4">
@@ -191,15 +166,12 @@ export default function CustomersPage() {
                   </div>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Real Balance', value: fmt.mwk(selected.balance || 0), color: 'text-green-400' },
+                  { label: 'Real Balance',  value: fmt.mwk(selected.balance || 0),       color: 'text-green-400' },
                   { label: 'Bonus Balance', value: fmt.mwk(selected.bonus_balance || 0), color: 'text-brand' },
-                  { label: 'Risk Score', value: `${selected.risk_score || 0}/100`, color: selected.risk_score >= 70 ? 'text-red-400' : 'text-green-400' },
-                  { label: 'Joined', value: fmt.date(selected.created_at), color: 'text-gray-300' },
-                  { label: 'Last Login', value: selected.last_login_at ? fmt.datetime(selected.last_login_at) : 'Never', color: 'text-gray-300' },
-                  { label: 'Referral Code', value: selected.referral_code || '—', color: 'text-brand font-mono' },
+                  { label: 'Risk Score',    value: `${selected.risk_score || 0}/100`,     color: selected.risk_score >= 70 ? 'text-red-400' : 'text-green-400' },
+                  { label: 'Joined',        value: fmt.date(selected.created_at),         color: 'text-gray-300' },
                 ].map(item => (
                   <div key={item.label} className="bg-admin-surface rounded-xl p-3">
                     <p className="text-xs text-gray-500 mb-0.5">{item.label}</p>
@@ -207,50 +179,34 @@ export default function CustomersPage() {
                   </div>
                 ))}
               </div>
-
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2">
                 {selected.is_suspended ? (
-                  <button onClick={() => { setSelected(null); setActionModal({ type: 'unsuspend', user: selected }); }}
-                    className="btn-primary flex-1 text-sm py-2.5">✓ Reactivate Account</button>
+                  <button onClick={() => { setSelected(null); setActionModal({ type: 'unsuspend', user: selected }); }} className="btn-primary flex-1">✓ Reactivate</button>
                 ) : (
-                  <button onClick={() => { setSelected(null); setActionModal({ type: 'suspend', user: selected }); }}
-                    className="btn-danger flex-1 text-sm py-2.5">⛔ Suspend Account</button>
+                  <button onClick={() => { setSelected(null); setActionModal({ type: 'suspend', user: selected }); }} className="btn-danger flex-1">⛔ Suspend</button>
                 )}
-                <button onClick={() => setSelected(null)} className="btn-secondary flex-1 text-sm py-2.5">Close</button>
+                <button onClick={() => setSelected(null)} className="btn-secondary flex-1">Close</button>
               </div>
             </div>
           )}
         </Modal>
 
-        {/* Action confirmation modal */}
-        <Modal
-          open={!!actionModal}
-          onClose={() => { setActionModal(null); setReason(''); }}
-          title={actionModal?.type === 'suspend' ? 'Suspend User' : 'Reactivate User'}>
+        <Modal open={!!actionModal} onClose={() => { setActionModal(null); setReason(''); }} title={actionModal?.type === 'suspend' ? 'Suspend User' : 'Reactivate User'}>
           {actionModal && (
             <div className="space-y-4">
               <p className="text-gray-400 text-sm">
                 {actionModal.type === 'suspend'
-                  ? `You are about to suspend ${actionModal.user.full_name}. They will not be able to login or place bets.`
-                  : `You are about to reactivate ${actionModal.user.full_name}. They will regain full access.`}
+                  ? `Suspend ${actionModal.user.full_name}? They will lose all access.`
+                  : `Reactivate ${actionModal.user.full_name}? They will regain full access.`}
               </p>
               {actionModal.type === 'suspend' && (
                 <div>
-                  <label className="block text-xs text-gray-400 mb-1.5">Reason for suspension *</label>
-                  <textarea
-                    value={reason}
-                    onChange={e => setReason(e.target.value)}
-                    placeholder="Enter reason..."
-                    rows={3}
-                    className="admin-input resize-none"
-                  />
+                  <label className="block text-xs text-gray-400 mb-1.5">Reason *</label>
+                  <textarea value={reason} onChange={e => setReason(e.target.value)} rows={3} className="admin-input resize-none" placeholder="Enter reason..." />
                 </div>
               )}
               <div className="flex gap-2">
-                <button
-                  onClick={handleAction}
-                  disabled={actionLoading}
-                  className={actionModal.type === 'suspend' ? 'btn-danger flex-1' : 'btn-primary flex-1'}>
+                <button onClick={handleAction} disabled={actionLoading} className={actionModal.type === 'suspend' ? 'btn-danger flex-1' : 'btn-primary flex-1'}>
                   {actionLoading ? 'Processing...' : actionModal.type === 'suspend' ? 'Confirm Suspend' : 'Confirm Reactivate'}
                 </button>
                 <button onClick={() => { setActionModal(null); setReason(''); }} className="btn-secondary flex-1">Cancel</button>
@@ -258,7 +214,6 @@ export default function CustomersPage() {
             </div>
           )}
         </Modal>
-
       </AdminLayout>
     </>
   );
