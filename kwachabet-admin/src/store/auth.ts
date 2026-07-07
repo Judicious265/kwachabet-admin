@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
 
 interface User {
@@ -22,17 +22,17 @@ interface AuthStore {
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
-      user: null,
-      token: null,
+      user:            null,
+      token:           null,
       isAuthenticated: false,
-      _hasHydrated: false,
+      _hasHydrated:    false,
 
-      setHasHydrated: (v) => set({ _hasHydrated: v }),
+      setHasHydrated: (v: boolean) => set({ _hasHydrated: v }),
 
-      login: (user, token) => {
+      login: (user: User, token: string) => {
         Cookies.set('kb_admin_token', token, {
-          expires: 1,
-          secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+          expires:  1,
+          secure:   typeof window !== 'undefined' && window.location.protocol === 'https:',
           sameSite: 'strict',
         });
         set({ user, token, isAuthenticated: true });
@@ -46,16 +46,6 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'kb-admin-auth',
-      storage: createJSONStorage(() => {
-        if (typeof window === 'undefined') {
-          return {
-            getItem: () => null,
-            setItem: () => {},
-            removeItem: () => {},
-          };
-        }
-        return localStorage;
-      }),
       partialize: (s) => ({
         user:            s.user,
         token:           s.token,
@@ -66,8 +56,8 @@ export const useAuthStore = create<AuthStore>()(
           state.setHasHydrated(true);
           if (state.token) {
             Cookies.set('kb_admin_token', state.token, {
-              expires: 1,
-              secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+              expires:  1,
+              secure:   typeof window !== 'undefined' && window.location.protocol === 'https:',
               sameSite: 'strict',
             });
           }
@@ -76,6 +66,3 @@ export const useAuthStore = create<AuthStore>()(
     }
   )
 );
-
-// Named export for compatibility
-export default useAuthStore;
