@@ -2,16 +2,17 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Toaster } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
+import { useAuthStore } from '../store/auth';
 
 export default function App({ Component, pageProps }: AppProps) {
-  // Wait for Zustand store to hydrate from localStorage before rendering
   const [hydrated, setHydrated] = useState(false);
+  const setHasHydrated = useAuthStore((s) => s.setHasHydrated);
 
   useEffect(() => {
+    setHasHydrated(true);
     setHydrated(true);
   }, []);
 
-  // Show minimal loading screen until store is ready
   if (!hydrated) {
     return (
       <div className="min-h-screen bg-admin-bg flex items-center justify-center">
