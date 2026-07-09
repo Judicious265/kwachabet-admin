@@ -7,11 +7,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Signal zustand store that client has hydrated
-    try {
-      const { useAuthStore } = require('../store/auth');
-      useAuthStore.getState().setHasHydrated(true);
-    } catch (e) {}
     setHydrated(true);
   }, []);
 
