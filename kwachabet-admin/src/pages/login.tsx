@@ -26,7 +26,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', form);
+      const res = await api.post('/admin-auth/login', form);
       const { user, token } = res.data;
       if (!user.is_admin) {
         toast.error('Access denied. Admin accounts only.');
