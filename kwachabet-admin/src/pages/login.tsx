@@ -30,6 +30,7 @@ export default function LoginPage() {
 const { admin, token } = res.data;
 login(admin, token);
       toast.success(`Welcome back, ${admin.full_name.split(' ')[0]}!`);
+setTimeout(() => { window.location.href = '/'; }, 500);
       router.push('/');
     } catch (err: any) {
       const msg = err.message || 'Login failed';
