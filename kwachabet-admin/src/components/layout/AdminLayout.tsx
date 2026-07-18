@@ -73,11 +73,10 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
   const [checking, setChecking]       = useState(true);
 
   useEffect(() => {
-    if (!_hasHydrated) return;
-    if (!isAuthenticated || !user) { router.push('/login'); return; }
-    if (!user.is_admin) { logout(); return; }
-    setChecking(false);
-  }, [_hasHydrated, isAuthenticated, user]);
+  if (!_hasHydrated) return;
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
+  setChecking(false);
+}, [_hasHydrated, isAuthenticated, user]);
 
   if (!_hasHydrated || checking) {
     return (
