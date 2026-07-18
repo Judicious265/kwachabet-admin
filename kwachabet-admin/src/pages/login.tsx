@@ -29,7 +29,7 @@ export default function LoginPage() {
      const res = await api.post('/admin-auth/login', form);
 const { admin, token } = res.data;
 login(admin, token);
-      toast.success(`Welcome back, ${user.full_name.split(' ')[0]}!`);
+      toast.success(`Welcome back, ${admin.full_name.split(' ')[0]}!`);
       router.push('/');
     } catch (err: any) {
       const msg = err.message || 'Login failed';
