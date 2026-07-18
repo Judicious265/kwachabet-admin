@@ -26,13 +26,9 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/admin-auth/login', form);
-      const { user, token } = res.data;
-      if (!user.is_admin) {
-        toast.error('Access denied. Admin accounts only.');
-        return;
-      }
-      login(user, token);
+     const res = await api.post('/admin-auth/login', form);
+const { admin, token } = res.data;
+login(admin, token);
       toast.success(`Welcome back, ${user.full_name.split(' ')[0]}!`);
       router.push('/');
     } catch (err: any) {
