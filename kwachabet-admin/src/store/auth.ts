@@ -6,7 +6,10 @@ interface User {
   id: string;
   phone: string;
   full_name: string;
-  is_admin: boolean;
+  is_admin?: boolean;
+  role?: string;
+  role_label?: string;
+  permissions?: Record<string, any>;
 }
 
 interface AuthStore {
@@ -52,16 +55,7 @@ export const useAuthStore = create<AuthStore>()(
         isAuthenticated: s.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.setHasHydrated(true);
-          if (state.token) {
-            Cookies.set('kb_admin_token', state.token, {
-              expires:  1,
-              secure:   typeof window !== 'undefined' && window.location.protocol === 'https:',
-              sameSite: 'strict',
-            });
-          }
-        }
+        if (state) state.setHasHydrated(true);
       },
     }
   )
