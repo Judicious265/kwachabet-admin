@@ -18,9 +18,8 @@ export default function BetsPage() {
   const [total, setTotal] = useState(1);
   const [selected, setSelected] = useState<any>(null);
 
-  useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
-    load();
+ useEffect(() => {
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
   }, [isAuthenticated, page, status]);
 
   async function load() {
