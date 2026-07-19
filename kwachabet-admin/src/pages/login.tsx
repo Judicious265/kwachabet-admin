@@ -21,25 +21,24 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-     const res = await api.post('/admin-auth/login', form);
-const { admin, token } = res.data;
-login(admin, token);
-      toast.success(`Welcome back, ${admin.full_name.split(' ')[0]}!`);
-setTimeout(() => { window.location.href = '/'; }, 500);
-      router.push('/');
-    } catch (err: any) {
-      const msg = err.message || 'Login failed';
-      setError(msg);
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+ async function handleLogin(e: React.FormEvent) {
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+  try {
+    const res = await api.post('/admin-auth/login', form);
+    const { admin, token } = res.data;
+    login(admin, token);
+    toast.success(`Welcome back, ${admin.full_name.split(' ')[0]}!`);
+    window.location.replace('/');
+  } catch (err: any) {
+    const msg = err.message || 'Login failed';
+    setError(msg);
+    toast.error(msg);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <>
