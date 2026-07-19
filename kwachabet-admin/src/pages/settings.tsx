@@ -55,7 +55,7 @@ export default function SettingsPage() {
   const [freeBetForm, setFreeBetForm] = useState({ user_id: '', amount: '', expiry_days: '7' });
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
     loadCampaigns();
   }, [isAuthenticated]);
 
