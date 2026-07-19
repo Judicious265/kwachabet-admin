@@ -64,7 +64,7 @@ export default function SportsPage() {
   const [resultForm, setResultForm] = useState({ home_score: '', away_score: '', result: '' });
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
     loadEvents();
   }, [isAuthenticated, sport, statusFilter, page]);
 
