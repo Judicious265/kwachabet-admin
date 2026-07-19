@@ -49,8 +49,8 @@ export default function AdminsPage() {
   const [addForm, setAddForm] = useState({ full_name: '', phone: '+265', email: '', password: '', role_name: 'customer_support' });
   const [editForm, setEditForm] = useState({ full_name: '', email: '', role_name: '', new_password: '' });
 
-  useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
+ useEffect(() => {
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
     loadAll();
   }, [isAuthenticated]);
 
