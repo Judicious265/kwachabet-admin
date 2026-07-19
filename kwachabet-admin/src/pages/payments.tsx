@@ -23,8 +23,7 @@ export default function PaymentsPage() {
   const [typeFilter, setTypeFilter] = useState('all');
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
-    load();
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
   }, [isAuthenticated, tab, page, typeFilter]);
 
   async function load() {
