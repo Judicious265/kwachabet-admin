@@ -38,13 +38,12 @@ export default function DashboardPage() {
   const [loading, setLoading]         = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  useEffect(() => {
-    if (!isAuthenticated) { router.push('/login'); return; }
-    if (user && !user.is_admin) { router.push('/login'); return; }
-    loadAll();
-    const interval = setInterval(loadAll, 60000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated, user]);
+ useEffect(() => {
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
+  loadAll();
+  const interval = setInterval(loadAll, 60000);
+  return () => clearInterval(interval);
+}, [isAuthenticated, user]);
 
   const loadAll = useCallback(async () => {
     try {
