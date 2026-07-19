@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store/auth';
 import { fmt } from '../../lib/api';
 
-// ── Nav items per role ────────────────────────────────────────────────────────
 const ROLE_NAV: Record<string, { href: string; label: string; icon: string; alert?: boolean }[]> = {
   super_admin: [
     { href: '/',          label: 'Dashboard',    icon: '📊' },
@@ -43,7 +42,6 @@ const ROLE_NAV: Record<string, { href: string; label: string; icon: string; aler
   ],
 };
 
-// ── Role badge colors ─────────────────────────────────────────────────────────
 const ROLE_COLORS: Record<string, string> = {
   super_admin:      'badge-danger',
   customer_support: 'badge-info',
@@ -52,7 +50,6 @@ const ROLE_COLORS: Record<string, string> = {
   finance_admin:    'badge-purple',
 };
 
-// ── Role labels ───────────────────────────────────────────────────────────────
 const ROLE_LABELS: Record<string, string> = {
   super_admin:      'Super Admin',
   customer_support: 'Customer Support',
@@ -68,17 +65,22 @@ interface LayoutProps {
 
 export default function AdminLayout({ children, title = 'Dashboard' }: LayoutProps) {
   const router = useRouter();
-  const { user, isAuthenticated, logout, _hasHydrated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [checking, setChecking]       = useState(true);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-  if (!_hasHydrated) return;
-  if (!isAuthenticated || !user) { router.push('/login'); return; }
-  setChecking(false);
-}, [_hasHydrated, isAuthenticated, user]);
+    const timer = setTimeout(() => {
+      if (!isAuthenticated || !user) {
+        router.push('/login');
+      } else {
+        setChecking(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, user]);
 
-  if (!_hasHydrated || checking) {
+  if (checking) {
     return (
       <div className="min-h-screen bg-admin-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -92,25 +94,19 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
     );
   }
 
-  // Get nav items for this admin's role
-  // Fall back to super_admin nav if role not found
-  const userRole   = (user as any)?.role || 'super_admin';
-  const navItems   = ROLE_NAV[userRole] || ROLE_NAV['super_admin'];
-  const roleBadge  = ROLE_COLORS[userRole] || 'badge-gray';
-  const roleLabel  = ROLE_LABELS[userRole] || 'Admin';
+  const userRole  = (user as any)?.role || 'super_admin';
+  const navItems  = ROLE_NAV[userRole] || ROLE_NAV['super_admin'];
+  const roleBadge = ROLE_COLORS[userRole] || 'badge-gray';
+  const roleLabel = ROLE_LABELS[userRole] || 'Admin';
 
   return (
     <div className="min-h-screen bg-admin-bg flex">
-
-      {/* Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 z-50 w-60 bg-admin-surface border-r border-admin-border
         flex flex-col transform transition-transform duration-200
         lg:relative lg:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-
-        {/* Logo */}
         <div className="p-4 border-b border-admin-border flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
@@ -123,7 +119,6 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
           </div>
         </div>
 
-        {/* Role badge */}
         <div className="px-4 py-2.5 border-b border-admin-border flex-shrink-0">
           <div className="flex items-center justify-between">
             <span className={`badge ${roleBadge} text-xs`}>{roleLabel}</span>
@@ -134,7 +129,6 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
           </div>
         </div>
 
-        {/* Navigation — role specific */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {navItems.map(item => {
             const active = router.pathname === item.href;
@@ -155,7 +149,6 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
           })}
         </nav>
 
-        {/* User profile */}
         <div className="p-3 border-t border-admin-border flex-shrink-0">
           <div className="flex items-center gap-2 mb-2.5">
             <div className="w-9 h-9 bg-brand/20 border border-brand/30 rounded-full flex items-center justify-center flex-shrink-0">
@@ -165,7 +158,7 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-xs font-semibold truncate">{user?.full_name}</p>
-              <p className="text-gray-500 text-xs truncate">{user?.phone}</p>
+              <p className="text-gray-500 text-xs truncate">{(user as any)?.phone}</p>
             </div>
           </div>
           <button
@@ -177,15 +170,11 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
         </div>
       </aside>
 
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Main content */}
       <div className="flex-1 min-w-0 flex flex-col min-h-screen">
-
-        {/* Top bar */}
         <header className="h-14 bg-admin-surface border-b border-admin-border flex items-center justify-between px-4 flex-shrink-0 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden text-gray-400 hover:text-white p-1">
@@ -195,7 +184,6 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
             </button>
             <h1 className="text-white font-bold text-lg">{title}</h1>
           </div>
-
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-500 hidden sm:block">
               {new Date().toLocaleString('en-GB', {
@@ -213,11 +201,9 @@ export default function AdminLayout({ children, title = 'Dashboard' }: LayoutPro
           </div>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           {children}
         </main>
-
       </div>
     </div>
   );
