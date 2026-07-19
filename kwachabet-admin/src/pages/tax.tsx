@@ -28,8 +28,8 @@ export default function TaxPage() {
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
+ useEffect(() => {
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
     load();
   }, [isAuthenticated]);
 
