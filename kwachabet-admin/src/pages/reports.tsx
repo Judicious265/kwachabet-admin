@@ -40,9 +40,8 @@ export default function ReportsPage() {
   const [generating, setGenerating] = useState('');
   const weeklyData = generateWeeklyData();
 
-  useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
-    load();
+ useEffect(() => {
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
   }, [isAuthenticated]);
 
   async function load() {
