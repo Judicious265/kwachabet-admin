@@ -22,8 +22,7 @@ export default function CustomersPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.is_admin) { router.push('/login'); return; }
-    load();
+  if (!isAuthenticated || !user) { router.push('/login'); return; }
   }, [isAuthenticated, page, filter]);
 
   async function load() {
